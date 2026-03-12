@@ -1,0 +1,5 @@
+All dates MUST be using the central timezone. This is especially important for clients passing in `minDate`.
+The easiest way to facilitate this is to pass in `1 + ` the `date.getTime()` of the most recent song of the most recent response from `/get-current-show`, if you want to get only the shows played after the most recent one last time you checked
+
+For a show ending at 12am (00:00), the **`endHour`** must be `24`.
+For a show starting at 12am (00:00), the **`startHour`** must be `0`.

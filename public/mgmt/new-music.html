@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>New Music | Radio UTD Management Interface</title>
+  <style>
+    table, td {
+      border: 1px solid #333;
+    }
+
+    th, td {
+      padding: 4px;
+    }
+
+    thead, tfoot {
+      background-color: #333;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1>New Music (OLD)</h1>
+  <h2><a href="new-music-weekly.html">Go To Weekly Music Tracking</a></h2>
+  <input id="file" type="file">
+  <h2 id="sheet-name"></h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Chart Position</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Promoter</th>
+        <th>Number of Plays</th>
+      </tr>
+    </thead>
+    <tbody id="albums-list"></tbody>
+  </table>
+  <script src="lib/shim.min.js"></script>
+  <script src="lib/xlsx.full.min.js"></script>
+  <script src="new-music.js"></script>
+</body>
+</html>

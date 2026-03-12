@@ -1,0 +1,17 @@
+{
+  "name": "radioutd2",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "proxy": "http://localhost:3000",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@picocss/pico": "^1.5.11",
+    "express": "^4.17.1",
+    "luxon": "^3.4.4",
+    "mongoose": "^5.13.22",
+    "xlsx": "^0.17.1"
+  }
+}

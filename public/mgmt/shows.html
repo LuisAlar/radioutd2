@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Shows | Radio UTD Management Interface</title>
+</head>
+<body>
+  <h1>Shows</h1>
+  <h3>Current Shows</h3>
+  <ul id="shows"></ul>
+  <h3>Add a Show</h3>
+  <form id="add-show-form" action="/api/add-show" method="get">
+    <div>
+      <label for="password">Management Password: </label>
+      <input type="password" name="password" id="password" required>
+    </div>
+    <div>
+      <label for="title">Title: </label>
+      <input type="text" name="title" id="title" required>
+    </div>
+    <div>
+      <label for="host">Host: </label>
+      <input type="text" name="host" id="host" required>
+    </div>
+    <div>
+      <label for="description">Description: </label>
+      <textarea style="width: 300px; height: 200px;" form="add-show-form" name="description" id="description" required></textarea>
+    </div>
+    <div>
+      <label for="iconUrl">Icon URL: </label>
+      <input type="url" name="iconUrl" id="iconUrl">
+    </div>
+    <div>
+      <label for="bgHorizontalUrl">Horizontal Background URL: </label>
+      <input type="url" name="bgHorizontalUrl" id="bgHorizontalUrl">
+    </div>
+    <div>
+      <label for="bgVerticalUrl">Vertical Background URL: </label>
+      <input type="url" name="bgVerticalUrl" id="bgVerticalUrl">
+    </div>
+    <div>
+      <label for="colorLight">Light Color: </label>
+      <input type="text" name="colorLight" id="colorLight">
+    </div>
+    <div>
+      <label for="colorDark">Dark Color: </label>
+      <input type="text" name="colorDark" id="colorDark">
+    </div>
+    <div>
+      <label for="day">Day: </label>
+      <select name="day" id="day">
+        <option value="0">Sunday</option>
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5">Friday</option>
+        <option value="6">Saturday</option>
+      </select>
+    </div>
+    <div>
+      <label for="startHour">Start Hour: </label>
+      <select name="startHour" id="startHour">
+        <option value="0">12am</option>
+        <option value="1">1am</option>
+        <option value="2">2am</option>
+        <option value="3">3am</option>
+        <option value="4">4am</option>
+        <option value="5">5am</option>
+        <option value="6">6am</option>
+        <option value="7">7am</option>
+        <option value="8">8am</option>
+        <option value="9">9am</option>
+        <option value="10">10am</option>
+        <option value="11">11am</option>
+        <option value="12">12pm</option>
+        <option value="13">1pm</option>
+        <option value="14">2pm</option>
+        <option value="15">3pm</option>
+        <option value="16">4pm</option>
+        <option value="17">5pm</option>
+        <option value="18">6pm</option>
+        <option value="19">7pm</option>
+        <option value="20">8pm</option>
+        <option value="21">9pm</option>
+        <option value="22">10pm</option>
+        <option value="23">11pm</option>
+      </select>
+    </div>
+    <div>
+      <label for="endHour">End Hour: </label>
+      <select name="endHour" id="endHour">
+        <option value="24">12am</option>
+        <option value="1">1am</option>
+        <option value="2">2am</option>
+        <option value="3">3am</option>
+        <option value="4">4am</option>
+        <option value="5">5am</option>
+        <option value="6">6am</option>
+        <option value="7">7am</option>
+        <option value="8">8am</option>
+        <option value="9">9am</option>
+        <option value="10">10am</option>
+        <option value="11">11am</option>
+        <option value="12">12pm</option>
+        <option value="13">1pm</option>
+        <option value="14">2pm</option>
+        <option value="15">3pm</option>
+        <option value="16">4pm</option>
+        <option value="17">5pm</option>
+        <option value="18">6pm</option>
+        <option value="19">7pm</option>
+        <option value="20">8pm</option>
+        <option value="21">9pm</option>
+        <option value="22">10pm</option>
+        <option value="23">11pm</option>
+      </select>
+    </div>
+    <div>
+      <input type="submit" value="Add Show">
+    </div>
+  </form>
+  <script src="shows.js"></script>
+</body>
+</html>
