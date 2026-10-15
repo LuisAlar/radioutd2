@@ -56,26 +56,30 @@ export default async function handler (req, res) {
     return res.status(500).send('Error finding songs for current show')
   }
 
-  for (let i = 0; i < result.songs.length; ++i) {
-    const id = result.songs[i].songId
-    const playedDate = result.songs[i].date
+  try {
+    const songIds = result.songs.map(song => song.songId)
+    const songMetadata = await Song.find({
+      _id: { $in: songIds },
+    }).exec()
+    const songsById = new Map(songMetadata.map(song => [song._id.toString(), song]))
 
-    try {
-      const meta = await Song.findOne({
-        _id: id,
-      }).exec()
+    result.songs = result.songs.map(song => {
+      const meta = songsById.get(song.songId.toString())
+      if (!meta) {
+        throw new Error('Missing song metadata for ID: ' + song.songId)
+      }
 
-      result.songs[i] = {
+      return {
         title: meta.title,
         artist: meta.artist,
         album: meta.album,
-        date: playedDate,
+        date: song.date,
       }
-    } catch (err) {
-      console.trace('Error finding song metadata by ID: ' + id)
-      console.error(err)
-      return res.status(500).send('Error finding song metadata')
-    }
+    })
+  } catch (err) {
+    console.trace('Error finding song metadata')
+    console.error(err)
+    return res.status(500).send('Error finding song metadata')
   }
 
   return res.status(200).json(result)
