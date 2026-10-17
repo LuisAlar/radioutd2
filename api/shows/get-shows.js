@@ -1,5 +1,5 @@
-import dbConnect from '../utils/db-connect'
-import getShows from '../utils/get-shows'
+import dbConnect from '../../utils/db-connect'
+import getShows from '../../utils/get-shows'
 
 export default async function handler (req, res) {
   if (req.method !== 'GET') {

@@ -16,6 +16,7 @@ module.exports = async (options) => {
     console.error(err)
   }
 
+  // Creates song if it doesnt exist
   if (!song) {
     song = new CurrentSong({
       title: null,
@@ -24,6 +25,7 @@ module.exports = async (options) => {
     })
   }
 
+  // Adds the new song to the database
   song.title = options.title
   song.artist = options.artist
   song.album = options.album

@@ -1,6 +1,6 @@
-import dbConnect from '../utils/db-connect'
-import getSongsByArtistAlbum from '../utils/get-songs-by-artist-album'
-import getSongNumPlaysByWeek from '../utils/get-song-num-plays-by-week'
+import dbConnect from '../../utils/db-connect'
+import getSongsByArtistAlbum from '../../utils/get-songs-by-artist-album'
+import getSongNumPlaysByWeek from '../../utils/get-song-num-plays-by-week'
 import { DateTime } from 'luxon'
 
 export default async function handler (req, res) {

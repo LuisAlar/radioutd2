@@ -1,6 +1,6 @@
-import dbConnect from '../utils/db-connect'
-import getSongsByArtistAlbum from '../utils/get-songs-by-artist-album'
-import getSongNumPlays from '../utils/get-song-num-plays'
+import dbConnect from '../../utils/db-connect'
+import getSongsByArtistAlbum from '../../utils/get-songs-by-artist-album'
+import getSongNumPlays from '../../utils/get-song-num-plays'
 
 export default async function handler (req, res) {
   if (req.method !== 'POST') {

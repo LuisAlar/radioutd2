@@ -1,6 +1,6 @@
-import allowCors from '../utils/allow-cors'
-import dbConnect from '../utils/db-connect'
-import addComment from '../utils/add-comment'
+import allowCors from '../../utils/allow-cors'
+import dbConnect from '../../utils/db-connect'
+import addComment from '../../utils/add-comment'
 
 export default async function handler (req, res) {
   if (allowCors(req, res)) {

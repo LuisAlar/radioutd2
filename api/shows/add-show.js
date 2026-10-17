@@ -1,5 +1,5 @@
-import dbConnect from '../utils/db-connect'
-import addShow from '../utils/add-show'
+import dbConnect from '../../utils/db-connect'
+import addShow from '../../utils/add-show'
 
 const MGMT_PASSWORD = process.env.MGMT_PASSWORD
 

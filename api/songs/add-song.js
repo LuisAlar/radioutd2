@@ -1,6 +1,6 @@
-import dbConnect from '../utils/db-connect'
-import addSong from '../utils/add-song'
-import setCurrentSong from '../utils/set-current-song'
+import dbConnect from '../../utils/db-connect'
+import addSong from '../../utils/add-song'
+import setCurrentSong from '../../utils/set-current-song'
 
 const AUTOMATION_PASSWORD = process.env.AUTOMATION_PASSWORD
 
