@@ -1,5 +1,5 @@
-import dbConnect from '../../utils/db-connect'
-import getComments from '../../utils/get-comments'
+import dbConnect from '../utils/db-connect'
+import getComments from '../utils/get-comments'
 
 const DJ_PASSWORD = process.env.DJ_PASSWORD
 

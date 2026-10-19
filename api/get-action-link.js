@@ -1,6 +1,6 @@
-import allowCors from '../../utils/allow-cors'
-import dbConnect from '../../utils/db-connect'
-import getActionLink from '../../utils/get-action-link'
+import allowCors from '../utils/allow-cors'
+import dbConnect from '../utils/db-connect'
+import getActionLink from '../utils/get-action-link'
 
 export default async function handler (req, res) {
   if (allowCors(req, res)) {

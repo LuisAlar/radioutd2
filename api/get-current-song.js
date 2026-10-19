@@ -1,6 +1,6 @@
-import allowCors from '../../utils/allow-cors'
-import dbConnect from '../../utils/db-connect'
-import getCurrentSong from '../../utils/get-current-song'
+import allowCors from '../utils/allow-cors'
+import dbConnect from '../utils/db-connect'
+import getCurrentSong from '../utils/get-current-song'
 
 export default async function handler (req, res) {
   if (allowCors(req, res)) {

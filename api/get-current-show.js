@@ -1,9 +1,9 @@
-import allowCors from '../../utils/allow-cors'
-import dbConnect from '../../utils/db-connect'
-import newCentralTimezoneDate from '../../utils/new-central-timezone-date'
-import getCurrentShow from '../../utils/get-current-show'
-import Song from '../../models/Song'
-import PlayedSong from '../../models/PlayedSong'
+import allowCors from '../utils/allow-cors'
+import dbConnect from '../utils/db-connect'
+import newCentralTimezoneDate from '../utils/new-central-timezone-date'
+import getCurrentShow from '../utils/get-current-show'
+import Song from '../models/Song'
+import PlayedSong from '../models/PlayedSong'
 
 export default async function handler (req, res) {
   if (allowCors(req, res)) {

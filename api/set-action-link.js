@@ -1,5 +1,5 @@
-import dbConnect from '../../utils/db-connect'
-import setActionLink from '../../utils/set-action-link'
+import dbConnect from '../utils/db-connect'
+import setActionLink from '../utils/set-action-link'
 
 const DJ_PASSWORD = process.env.DJ_PASSWORD
 
