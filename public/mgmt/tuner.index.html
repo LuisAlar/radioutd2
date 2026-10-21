@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta name="description" content="Tune in to Radio UTD's stream, and view details about the currently playing track.">
+        <meta property="og:image" content="/tuner/assets/og-image.jpg">
+        <link rel="icon" type="image/png" href="/tuner/icon.c5a8514a.png">
+        <link rel="stylesheet" href="/tuner/index.1bcf5ab7.css">
+        <title>Tuner - Radio UTD</title>
+    </head>
+    <body>
+        <div id="upper-wrap">
+            <div id="sidebar-left">
+                <button id="sidebar-left-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                    </svg>
+                </button>
+                <a class="wordmark" href="https://radioutd.com/blog">
+                    <svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 1250 274">
+                        <defs></defs>
+                        <g transform="translate(-341 -402.8)">
+                            <g>
+                                <path fill="#fff" d="M720 617.6h-17.5l-40-77h-41v76.9H606V447h61.3c12.9 0 23.9 4.6 33 13.8a45 45 0 0113.7 33c0 10.7-3.3 20.2-9.9 28.7a45.4 45.4 0 01-24.7 16.4zM667.2 525c8.5 0 15.9-3 22-9 6-6.2 9-13.5 9-22 0-8.6-3-15.9-9-22a30 30 0 00-22-9.1h-45.6v62z" class="st0"></path>
+                                <path fill="#fff" d="M849.5 447v170.6h-15.6l.5-55h-60.8l-34.3 55h-18.6l107.9-170.5zm-75.9 115.5h60.8L834 468z" class="st0"></path>
+                                <path fill="#fff" d="M870.1 617.6V447.1h42c23.5 0 43.6 8.3 60.3 25a82 82 0 0125 60.2 82 82 0 01-25 60.3 82.2 82.2 0 01-60.3 25h-42zm15.6-15.5h26.4c19.2 0 35.6-6.8 49.2-20.5a67.2 67.2 0 0020.5-49.2c0-19.3-6.8-35.7-20.5-49.3a67.2 67.2 0 00-49.2-20.5h-26.4z" class="st0"></path>
+                                <path fill="#fff" d="M1005.6 446.3h15.8v171.3h-15.8z" class="st0"></path>
+                                <path fill="#fff" d="M1055.2 593.9a83.5 83.5 0 01-25.6-61.4c0-24 8.6-44.5 25.6-61.6 17-16.9 37.4-25.4 61.4-25.4A84 84 0 011178 471a84 84 0 0125.4 61.6c0 24-8.5 44.4-25.4 61.4a83.9 83.9 0 01-61.5 25.5c-24 0-44.5-8.5-61.4-25.5zm11-111.8a68.6 68.6 0 00-20.9 50.4c0 19.6 7 36.4 21 50.3 13.9 14 30.6 21 50.3 21 19.6 0 36.4-7 50.3-21 14-14 21-30.7 21-50.3 0-19.7-7-36.5-21-50.4a68.6 68.6 0 00-50.3-20.9c-19.7 0-36.4 7-50.4 21z" class="st0"></path>
+                                <path fill="#fff" d="M1234.3 602.3a56.6 56.6 0 01-17.3-41.6V447.4h15.7v113.3c0 12 4.2 22 12.6 30.5a41.6 41.6 0 0030.5 12.8c12 0 22-4.3 30.5-12.7a41.8 41.8 0 0012.6-30.6V447.4h15.7v113.3c0 16.3-5.7 30.1-17.2 41.6a56.6 56.6 0 01-41.6 17.2 56.7 56.7 0 01-41.5-17.2z" class="st0"></path>
+                                <path fill="#fff" d="M1450.2 447v15.8h-44.7v154.8h-15.7V462.8H1345V447z" class="st0"></path>
+                                <path fill="#fff" d="M1463.8 617.6V447.1h42c23.4 0 43.6 8.3 60.3 25a82 82 0 0124.9 60.2 82 82 0 01-25 60.3 82.2 82.2 0 01-60.3 25h-41.9zm15.6-15.5h26.3c19.3 0 35.7-6.8 49.3-20.5a67.2 67.2 0 0020.4-49.2c0-19.3-6.8-35.7-20.4-49.3a67.2 67.2 0 00-49.3-20.5h-26.3z" class="st0"></path>
+                            </g>
+                        </g>
+                        <g transform="translate(-341 -402.8)">
+                            <path fill="#ca7122" d="M398 649s3 19 21 5 149-99 149-99 24-14.3 0-30.1L412 422s-9-5-15 3 1 224 1 224z"></path>
+                            <path fill="#4d8d42" d="M369 429s-19-18-28 1v220s9 21 28-1c9.1-10.6 0-220 0-220z"></path>
+                            <path fill="#fff" d="M366.8 416.3s4-21 21-9 159 119 159 119 13.2 17.7 0 28.5c-17 14-163 121.5-163 121.5s-16.5 3.6-17-9c-.5-14.7.5-250.7 0-251z" class="st0"></path>
+                        </g>
+                    </svg>
+                </a>
+                <div id="on-air-label">On-Air</div>
+                <div id="show-info">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Show Icon" id="show-info-icon">
+                    <div id="show-info-text-wrap">
+                        <div id="show-name">
+                            <div class="loading-placeholder"></div>
+                        </div>
+                        <div id="show-host">
+                            <div class="loading-placeholder"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="show-desc">
+                    <div class="loading-placeholder"></div>
+                </div>
+                <div id="comment-wrap">
+                    <textarea id="comment-input" placeholder="Send the DJ a message!" maxlength="512"></textarea>
+                    <button id="comment-submit">Send</button>
+                </div>
+            </div>
+            <div id="hamburger-wrap">
+                <button id="hamburger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+                    </svg>
+                </button>
+                <button id="open-history">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px" fill="#FFFFFF">
+                        <path d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="main">
+                <div id="main-now-playing">
+                    <div id="action-link-wrap">
+                        <svg id="action-link-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"></path>
+                        </svg>
+                        <a id="action-link" target="_blank" rel="noopener noreferrer"></a>
+                    </div>
+                    <div id="main-above-play">
+                        <div id="currently-playing-label">Currently Playing</div>
+                        <div class="song-info-part">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                                <path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"></path>
+                            </svg>
+                            <div class="scroll-wrapper">
+                                <div id="song-title">
+                                    <div class="loading-placeholder"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="song-info-part">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                            </svg>
+                            <div class="scroll-wrapper">
+                                <div id="song-artist">
+                                    <div class="loading-placeholder"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="song-info-part">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
+                            </svg>
+                            <div class="scroll-wrapper">
+                                <div id="song-album">
+                                    <div class="loading-placeholder"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="play-button">
+                        <svg id="play-button-play-icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
+                        <svg id="play-button-pause-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px" fill="#FFFFFF">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+                        </svg>
+                    </button>
+                    <div id="volume-wrap">
+                        <svg id="volume-icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
+                        </svg>
+                        <input type="range" min="0" max="100" step="1" value="100" id="volume-slider">
+                    </div>
+                </div>
+                <div id="main-history">
+                    <button id="history-close">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                        </svg>
+                    </button>
+                    <h3>Song History</h3>
+                    <ul id="history-contents"></ul>
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 1250 274">
+                <defs></defs>
+                <g transform="translate(-341 -402.8)">
+                    <g>
+                        <path fill="#fff" d="M720 617.6h-17.5l-40-77h-41v76.9H606V447h61.3c12.9 0 23.9 4.6 33 13.8a45 45 0 0113.7 33c0 10.7-3.3 20.2-9.9 28.7a45.4 45.4 0 01-24.7 16.4zM667.2 525c8.5 0 15.9-3 22-9 6-6.2 9-13.5 9-22 0-8.6-3-15.9-9-22a30 30 0 00-22-9.1h-45.6v62z" class="st0"></path>
+                        <path fill="#fff" d="M849.5 447v170.6h-15.6l.5-55h-60.8l-34.3 55h-18.6l107.9-170.5zm-75.9 115.5h60.8L834 468z" class="st0"></path>
+                        <path fill="#fff" d="M870.1 617.6V447.1h42c23.5 0 43.6 8.3 60.3 25a82 82 0 0125 60.2 82 82 0 01-25 60.3 82.2 82.2 0 01-60.3 25h-42zm15.6-15.5h26.4c19.2 0 35.6-6.8 49.2-20.5a67.2 67.2 0 0020.5-49.2c0-19.3-6.8-35.7-20.5-49.3a67.2 67.2 0 00-49.2-20.5h-26.4z" class="st0"></path>
+                        <path fill="#fff" d="M1005.6 446.3h15.8v171.3h-15.8z" class="st0"></path>
+                        <path fill="#fff" d="M1055.2 593.9a83.5 83.5 0 01-25.6-61.4c0-24 8.6-44.5 25.6-61.6 17-16.9 37.4-25.4 61.4-25.4A84 84 0 011178 471a84 84 0 0125.4 61.6c0 24-8.5 44.4-25.4 61.4a83.9 83.9 0 01-61.5 25.5c-24 0-44.5-8.5-61.4-25.5zm11-111.8a68.6 68.6 0 00-20.9 50.4c0 19.6 7 36.4 21 50.3 13.9 14 30.6 21 50.3 21 19.6 0 36.4-7 50.3-21 14-14 21-30.7 21-50.3 0-19.7-7-36.5-21-50.4a68.6 68.6 0 00-50.3-20.9c-19.7 0-36.4 7-50.4 21z" class="st0"></path>
+                        <path fill="#fff" d="M1234.3 602.3a56.6 56.6 0 01-17.3-41.6V447.4h15.7v113.3c0 12 4.2 22 12.6 30.5a41.6 41.6 0 0030.5 12.8c12 0 22-4.3 30.5-12.7a41.8 41.8 0 0012.6-30.6V447.4h15.7v113.3c0 16.3-5.7 30.1-17.2 41.6a56.6 56.6 0 01-41.6 17.2 56.7 56.7 0 01-41.5-17.2z" class="st0"></path>
+                        <path fill="#fff" d="M1450.2 447v15.8h-44.7v154.8h-15.7V462.8H1345V447z" class="st0"></path>
+                        <path fill="#fff" d="M1463.8 617.6V447.1h42c23.4 0 43.6 8.3 60.3 25a82 82 0 0124.9 60.2 82 82 0 01-25 60.3 82.2 82.2 0 01-60.3 25h-41.9zm15.6-15.5h26.3c19.3 0 35.7-6.8 49.3-20.5a67.2 67.2 0 0020.4-49.2c0-19.3-6.8-35.7-20.4-49.3a67.2 67.2 0 00-49.3-20.5h-26.3z" class="st0"></path>
+                    </g>
+                </g>
+                <g transform="translate(-341 -402.8)">
+                    <path fill="#ca7122" d="M398 649s3 19 21 5 149-99 149-99 24-14.3 0-30.1L412 422s-9-5-15 3 1 224 1 224z"></path>
+                    <path fill="#4d8d42" d="M369 429s-19-18-28 1v220s9 21 28-1c9.1-10.6 0-220 0-220z"></path>
+                    <path fill="#fff" d="M366.8 416.3s4-21 21-9 159 119 159 119 13.2 17.7 0 28.5c-17 14-163 121.5-163 121.5s-16.5 3.6-17-9c-.5-14.7.5-250.7 0-251z" class="st0"></path>
+                </g>
+            </svg>
+            <div id="about-wrap">
+                <div id="about-label">About Us</div>
+                <div>As the only student-run radio station for the University of Texas at Dallas, Radio UTD fulfills many duties on campus. Founded in 2002, the Radio UTD family has grown steadily thanks to the help from the university, student body, and ever supportive Dallas music scene.</div>
+            </div>
+            <div id="follow-us-wrap">
+                <div id="follow-us-label">Follow Us</div>
+                <div id="social-icons">
+                    <a href="https://www.facebook.com/RadioUTD/" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://instagram.com/radioutd/" target="_blank" rel="noopener noreferrer">
+                        <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF">
+                            <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://twitter.com/RadioUTD/" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCvK-JFQT3xuqJpERQoEItMw" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="#FFFFFF">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <audio id="audio" src="https://streamer.radio.co/sf849b08e1/listen" autoplay></audio>
+        <script src="/tuner/index.a786fc7a.js"></script>
+        <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"55eedc34c1734a75a3e3e3cc072433d1","r":1,"spa":2}' crossorigin="anonymous"></script>
+    </body>
+</html>
