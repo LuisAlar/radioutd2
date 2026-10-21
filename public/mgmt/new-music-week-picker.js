@@ -132,7 +132,7 @@ async function loadSelectedWeek () {
   refreshButton.disabled = true
 
   try {
-    const response = await fetch('/api/match-new-music-week', {
+    const response = await fetch('/api/match-new-music-per-week', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

@@ -1,9 +1,15 @@
 import dbConnect from '../utils/db-connect'
 import getSongsByArtistAlbum from '../utils/get-songs-by-artist-album'
 import getSongNumPlaysByWeek from '../utils/get-song-num-plays-by-week'
+import matchNewMusicWeek from '../utils/match-new-music-week'
 import { DateTime } from 'luxon'
 
 export default async function handler (req, res) {
+  // A weekStart in the body selects a single specific week (used by the week picker)
+  if (req.body && typeof req.body.weekStart !== 'undefined') {
+    return matchNewMusicWeek(req, res)
+  }
+
   if (req.method !== 'POST') {
     console.trace('match-new-music only supports POST method')
     res.status(500).send('This endpoint only supports POST method')

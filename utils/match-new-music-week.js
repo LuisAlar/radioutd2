@@ -3,7 +3,7 @@ import getSongsByArtistAlbum from '../utils/get-songs-by-artist-album'
 import PlayedSong from '../models/PlayedSong'
 import { DateTime } from 'luxon'
 
-export default async function handler (req, res) {
+export default async function matchNewMusicWeek (req, res) {
   if (req.method !== 'POST') {
     return res.status(405).send('This endpoint only supports POST method')
   }
