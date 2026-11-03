@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Show Playlists | Radio UTD</title>
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --surface: #ffffff;
+      --text: #1d1d1f;
+      --muted: #5f6066;
+      --border: #dcdad5;
+      --accent: #1e5aa0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141416;
+        --surface: #1f1f23;
+        --text: #ececee;
+        --muted: #a2a3aa;
+        --border: #34343a;
+        --accent: #7fb0ec;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.5 system-ui, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    main { max-width: 960px; margin: 0 auto; padding: 2rem 16px 4rem; }
+    h1 { margin: 0 0 .25rem; font-size: 2rem; }
+    .intro { color: var(--muted); margin: 0 0 1.5rem; }
+    .search { width: 100%; font: inherit; padding: .65rem .85rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
+    .status { color: var(--muted); margin: 1rem 0; }
+    h2.day { font-size: 1.1rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 2rem 0 .75rem; }
+
+    .show { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: .75rem; overflow: hidden; }
+    .show summary { list-style: none; display: flex; align-items: center; gap: .9rem; padding: .85rem 1rem; cursor: pointer; border-left: 6px solid var(--show-color, var(--accent)); }
+    .show summary::-webkit-details-marker { display: none; }
+    .show[data-empty] summary { cursor: default; }
+    .show summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .icon { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; flex: none; background: var(--border); }
+    .show-text { flex: 1; min-width: 0; }
+    .show-title { font-weight: 600; font-size: 1.05rem; }
+    .show-meta { color: var(--muted); font-size: .9rem; }
+    .badge { display: inline-block; font-size: .75rem; border: 1px solid var(--border); border-radius: 999px; padding: 0 .5rem; margin-left: .35rem; color: var(--muted); }
+    .count { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+    .chevron { color: var(--muted); transition: transform .15s; }
+    .show[open] .chevron { transform: rotate(90deg); }
+
+    .songs { border-top: 1px solid var(--border); padding: .5rem 1rem 1rem; }
+    .description { color: var(--muted); font-size: .9rem; margin: .5rem 0 .75rem; }
+    .songs ol { list-style: none; margin: 0; padding: 0; }
+    .songs li { display: flex; gap: .75rem; align-items: baseline; padding: .5rem 0; border-bottom: 1px solid var(--border); }
+    .songs li:last-child { border-bottom: none; }
+    .song-text { flex: 1; min-width: 0; }
+    .song-title { font-weight: 500; }
+    .song-meta { color: var(--muted); font-size: .875rem; }
+    .song-plays { color: var(--muted); font-size: .85rem; white-space: nowrap; text-align: right; }
+    .note { color: var(--muted); font-size: .85rem; margin-top: .75rem; }
+
+    @media (max-width: 560px) {
+      .icon { width: 40px; height: 40px; }
+      .count { display: none; }
+      .songs li { flex-direction: column; gap: 0; }
+      .song-plays { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Show Playlists</h1>
+    <p id="intro" class="intro">Songs played on Radio UTD shows this semester.</p>
+    <input id="search" class="search" type="search" placeholder="Search shows or hosts" aria-label="Search shows or hosts">
+    <p id="status" class="status" aria-live="polite">Loading shows…</p>
+    <div id="shows"></div>
+  </main>
+  <script src="playlists.js"></script>
+</body>
+</html>

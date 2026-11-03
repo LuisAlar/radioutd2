@@ -10,7 +10,7 @@ module.exports = async (options) => {
     return
   }
 
-  const curShow = getCurrentShow()
+  const curShow = await getCurrentShow()
   if (!curShow) {
     console.trace('Error finding currently playing show')
     return

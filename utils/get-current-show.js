@@ -14,6 +14,7 @@ module.exports = async () => {
       'day': day,
       'startHour': { $lte: hour },
       'endHour': { $gt: hour },
+      'effectiveTo': null,
     }).exec()
   } catch (err) {
     console.trace('Error finding current show')

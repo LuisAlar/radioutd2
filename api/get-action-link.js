@@ -1,6 +1,7 @@
 import allowCors from '../utils/allow-cors'
 import dbConnect from '../utils/db-connect'
 import getActionLink from '../utils/get-action-link'
+import setCdnCache from '../utils/set-cdn-cache'
 
 export default async function handler (req, res) {
   if (allowCors(req, res)) {
@@ -15,5 +16,7 @@ export default async function handler (req, res) {
 
   await dbConnect()
 
+  // Action links change rarely, so a longer window is fine
+  setCdnCache(res, 60)
   return res.status(200).json(await getActionLink())
 }

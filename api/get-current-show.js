@@ -4,6 +4,11 @@ import newCentralTimezoneDate from '../utils/new-central-timezone-date'
 import getCurrentShow from '../utils/get-current-show'
 import Song from '../models/Song'
 import PlayedSong from '../models/PlayedSong'
+import setCdnCache from '../utils/set-cdn-cache'
+
+// Caps the response size: without this, every poll returns the whole show's
+// playlist, which grows for the length of the show.
+const MAX_SONGS = 20
 
 export default async function handler (req, res) {
   if (allowCors(req, res)) {
@@ -48,7 +53,8 @@ export default async function handler (req, res) {
     }, null, {
       sort: {
         date: -1,
-      }
+      },
+      limit: MAX_SONGS,
     }).exec()
   } catch (err) {
     console.trace('Error finding songs for current show')
@@ -82,5 +88,6 @@ export default async function handler (req, res) {
     return res.status(500).send('Error finding song metadata')
   }
 
+  setCdnCache(res, 15)
   return res.status(200).json(result)
 }

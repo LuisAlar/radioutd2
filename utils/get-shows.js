@@ -5,7 +5,7 @@ module.exports = async () => {
   let result = null
 
   try {
-    result = await Show.find({}, null, {
+    result = await Show.find({ effectiveTo: null }, null, {
       sort: {
         day: 1,
         startHour: 1,

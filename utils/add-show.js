@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import newCentralTimezoneDate from '../utils/new-central-timezone-date'
 import Show from '../models/Show'
 
 module.exports = async (options) => {
@@ -19,6 +20,7 @@ module.exports = async (options) => {
     day: options.day,
     startHour: options.startHour,
     endHour: options.endHour,
+    effectiveFrom: newCentralTimezoneDate(),
   })
 
   try {

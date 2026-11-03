@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shows Report | Radio UTD Management</title>
+  <style>
+    body { font: 16px/1.45 sans-serif; margin: 2rem auto; max-width: 1100px; padding: 0 1rem; color: #222; }
+    label { display: inline-block; margin: 0 1rem 1rem 0; }
+    button, input, select { font: inherit; padding: .45rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #999; padding: .45rem; text-align: left; }
+    th { background: #333; color: white; }
+    tbody tr.clickable { cursor: pointer; }
+    tbody tr.clickable:hover { background: #eef3fa; }
+    tbody tr.selected { background: #dbe7f6; }
+    .status { margin: .75rem 0; }
+    .help { color: #444; max-width: 850px; }
+    .retired, .zero { color: #555; }
+    .unattributed { color: #9b1c1c; }
+  </style>
+</head>
+<body>
+  <h1>Shows Report</h1>
+  <p class="help">Plays grouped by show. "Logged with show" counts plays whose show was stored when Zetta logged them; the rest are matched to the schedule in effect at the time. Select a show to see the days it aired, then a day to see its playlist.</p>
+
+  <label>From
+    <input id="from" type="date">
+  </label>
+  <label>To
+    <input id="to" type="date">
+  </label>
+  <button id="load" type="button">Load</button>
+  <p id="status" class="status" aria-live="polite"></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Show</th>
+        <th>Host</th>
+        <th>Slot</th>
+        <th>Plays</th>
+        <th>Logged with show</th>
+        <th>Unique songs</th>
+        <th>Days aired</th>
+      </tr>
+    </thead>
+    <tbody id="shows-body"></tbody>
+  </table>
+
+  <h2 id="airings-title" hidden></h2>
+  <table id="airings-table" hidden>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Plays</th>
+        <th>First play</th>
+        <th>Last play</th>
+      </tr>
+    </thead>
+    <tbody id="airings-body"></tbody>
+  </table>
+
+  <h2 id="playlist-title" hidden></h2>
+  <table id="playlist-table" hidden>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Show source</th>
+      </tr>
+    </thead>
+    <tbody id="playlist-body"></tbody>
+  </table>
+
+  <script src="shows-report.js"></script>
+</body>
+</html>

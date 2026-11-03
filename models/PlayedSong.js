@@ -6,4 +6,8 @@ const playedSongSchema = new mongoose.Schema({
   date: Date,
 })
 
+playedSongSchema.index({ date: 1 })
+playedSongSchema.index({ songId: 1, date: 1 })
+playedSongSchema.index({ showId: 1, date: 1 })
+
 export default mongoose.models.PlayedSong || mongoose.model('PlayedSong', playedSongSchema)

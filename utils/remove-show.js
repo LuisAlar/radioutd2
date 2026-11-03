@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import newCentralTimezoneDate from '../utils/new-central-timezone-date'
 import Show from '../models/Show'
 
 module.exports = async (options) => {
@@ -7,14 +8,18 @@ module.exports = async (options) => {
     return
   }
 
+  // Retire rather than delete, so past plays can still be attributed to the show
   try {
-    await Show.deleteOne({
+    await Show.updateOne({
       day: options.day,
       startHour: options.startHour,
       endHour: options.endHour,
+      effectiveTo: null,
+    }, {
+      effectiveTo: newCentralTimezoneDate(),
     }).exec()
   } catch (err) {
-    console.trace('Error deleting show')
+    console.trace('Error retiring show')
     console.error(err)
   }
 }
