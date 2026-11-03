@@ -181,7 +181,7 @@ function updateList (albums) {
 }
 
 async function post (parsed) {
-  const response = await fetch('/api/match-new-music-per-week', {
+  const response = await fetch('/api/match-new-music?view=weekly', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',

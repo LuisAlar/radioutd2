@@ -9,15 +9,6 @@ async function loadShows () {
   }
 }
 
-async function deleteShow (show) {
-  const password = encodeURIComponent(window.prompt('Management password:'))
-  const day = encodeURIComponent(show.day)
-  const startHour = encodeURIComponent(show.startHour)
-  const endHour = encodeURIComponent(show.endHour)
-  await fetch(`/api/remove-show?password=${password}&day=${day}&startHour=${startHour}&endHour=${endHour}`)
-  await loadShows()
-}
-
 function createImageUrlWrapper (url, width, height) {
   const iconUrl = document.createElement('div')
   const iconUrlImg = document.createElement('img')
@@ -55,14 +46,6 @@ function insertShow (show) {
   const dayAndHours = document.createElement('div')
   wrapper.appendChild(dayAndHours)
   dayAndHours.textContent = `Day: ${show.day} / Start Hour: ${show.startHour} / End Hour: ${show.endHour}`
-  const deleteBtnWrap = document.createElement('div')
-  wrapper.appendChild(deleteBtnWrap)
-  const deleteBtn = document.createElement('button')
-  deleteBtnWrap.appendChild(deleteBtn)
-  deleteBtn.textContent = 'Delete'
-  deleteBtn.addEventListener('click', () => {
-    deleteShow(show)
-  })
 }
 
 loadShows()
