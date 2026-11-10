@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Station Schedule</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background-color: #f5f5f5;
+        }
+
+        /* ── Genre Legend ── */
+        .grid-container-genre {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        /* Hide legend on small screens */
+        @media (max-width: 600px) {
+            .grid-container-genre { display: none; }
+        }
+
+        /* ── Schedule Grid ── */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 60px repeat(5, 1fr);
+            gap: 4px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 600px) {
+            .grid-container {
+                grid-template-columns: 80px repeat(5, 1fr);
+                gap: 6px;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .grid-container {
+                grid-template-columns: 120px repeat(5, 1fr);
+                gap: 8px;
+            }
+        }
+
+        /* ── Base grid item ── */
+        .grid-item {
+            position: relative;
+            padding: clamp(3px, 1vw, 10px);
+            text-align: center;
+            color: black;
+            font-weight: bold;
+            min-height: clamp(40px, 7vw, 60px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-decoration: none;
+            transform: skew(-5deg, 0deg);
+            transition: transform 0.2s ease;
+        }
+
+        a.grid-item        { color: black; }
+        a.grid-item:visited { color: black; }
+
+        .grid-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 2px solid black;
+            background-color: transparent;
+        }
+
+        .grid-item::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px; right: -3px; bottom: -3px;
+            z-index: -1;
+        }
+
+        /* ── Genre chips ── */
+        .genre {
+            font-size: clamp(11px, 1.4vw, 14px);
+            padding: 8px 16px;
+        }
+
+        /* ── Day headers ── */
+        .day {
+            background-color: transparent;
+            color: black;
+            font-size: clamp(9px, 1.5vw, 16px);
+            font-weight: bold;
+            transform: none;
+        }
+        .day::before, .day::after { display: none; }
+
+        /* ── Showtime labels ── */
+        .showtime {
+            background-color: transparent;
+            color: black;
+            font-size: clamp(7px, 1.1vw, 13px);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: none;
+            padding: 4px 2px;
+        }
+        .showtime::before, .showtime::after { display: none; }
+
+        /* ── Colours ── */
+        .genre::after      { background-color: #333; }
+        .pop::after        { background-color: #b8006e; }
+        .alt-rock::after   { background-color: #b83232; }
+        .world::after      { background-color: #1a7a8c; }
+        .talk-show::after  { background-color: #c47000; }
+        .hip-hop::after    { background-color: #d4561a; }
+        .electronic::after { background-color: #7b2fa8; }
+        .trainee::after    { background-color: #1a5fbf; }
+        .shuffle::after    { background-color: #2a8c2a; }
+
+        /* White text on coloured tiles */
+        .pop, .pop .show-name, .pop .dj,
+        a.pop, a.pop:visited { color: #fff; }
+
+        .alt-rock, .alt-rock .show-name, .alt-rock .dj,
+        a.alt-rock, a.alt-rock:visited { color: #fff; }
+
+        .world, .world .show-name, .world .dj,
+        a.world, a.world:visited { color: #fff; }
+
+        .talk-show, .talk-show .show-name, .talk-show .dj,
+        a.talk-show, a.talk-show:visited { color: #fff; }
+
+        .hip-hop, .hip-hop .show-name, .hip-hop .dj,
+        a.hip-hop, a.hip-hop:visited { color: #fff; }
+
+        .electronic, .electronic .show-name, .electronic .dj,
+        a.electronic, a.electronic:visited { color: #fff; }
+
+        .trainee, .trainee .show-name { color: #fff; }
+        .shuffle, .shuffle .show-name { color: #fff; }
+
+        .genre.pop, .genre.alt-rock, .genre.world, .genre.talk-show,
+        .genre.hip-hop, .genre.electronic { color: #fff; }
+
+        /* ── Text inside tiles ── */
+        .show-name {
+            font-size: clamp(7px, 1.1vw, 12px);
+            font-weight: 900;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dj {
+            font-size: clamp(6px, 0.9vw, 10px);
+            font-weight: 800;
+            margin-top: 3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .grid-item:hover:not(.day):not(.showtime):not(.trainee):not(.shuffle) {
+            transform: skew(-5deg, 0deg) scale(1.05);
+        }
+
+        .trainee, .shuffle { cursor: default; }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: clamp(11px, 1.5vw, 14px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-container-genre">
+        <div class="grid-item pop genre">Pop</div>
+        <div class="grid-item alt-rock genre">Alt/Rock</div>
+        <div class="grid-item world genre">World</div>
+        <div class="grid-item talk-show genre">Talk Show</div>
+        <div class="grid-item hip-hop genre">Hip Hop/R&amp;B</div>
+        <div class="grid-item electronic genre">Electronic</div>
+    </div>
+
+    <div class="grid-container">
+
+        <div class="grid-item day"></div>
+        <div class="grid-item day">Monday</div>
+        <div class="grid-item day">Tuesday</div>
+        <div class="grid-item day">Wednesday</div>
+        <div class="grid-item day">Thursday</div>
+        <div class="grid-item day">Friday</div>
+
+        <div class="grid-item showtime">10AM – 11AM</div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+
+        <div class="grid-item showtime">11AM – 12PM</div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+        <div class="grid-item trainee"><div class="show-name">Trainee</div></div>
+
+        <div class="grid-item showtime">12PM – 2PM</div>
+        <a href="https://radioutd.com/shows/the-reflection/" class="grid-item pop">
+            <div class="show-name">The Reflection<br><span class="dj">Zara</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/overcast/" class="grid-item alt-rock">
+            <div class="show-name">Overcast<br><span class="dj">Madeline</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/studio54/" class="grid-item pop">
+            <div class="show-name">Studio54<br><span class="dj">Nashad</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/palmwine-n-plenty/" class="grid-item world">
+            <div class="show-name">Palmwine N' Plenty<br><span class="dj">Jimeto</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/five-rivers/" class="grid-item world">
+            <div class="show-name">Five Rivers<br><span class="dj">Anup</span></div>
+        </a>
+
+        <div class="grid-item showtime">2PM – 4PM</div>
+        <a href="https://radioutd.com/shows/global-riffs/" class="grid-item alt-rock">
+            <div class="show-name">Global Riffs<br><span class="dj">Carys</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/soul-train/" class="grid-item pop">
+            <div class="show-name">Soul Train<br><span class="dj">Michael</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/on-the-bass/" class="grid-item electronic">
+            <div class="show-name">On The Bass<br><span class="dj">Sebastian</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/doodle-tunes/" class="grid-item pop">
+            <div class="show-name">Doodle Tunes<br><span class="dj">Bhavna</span></div>
+        </a>
+        <div class="grid-item shuffle"><div class="show-name">Shuffle</div></div>
+
+        <div class="grid-item showtime">4PM – 6PM</div>
+        <a href="https://radioutd.com/shows/breaking-boundaries/" class="grid-item world">
+            <div class="show-name">Breaking Boundaries<br><span class="dj">Charishma</span></div>
+        </a>
+        <div class="grid-item shuffle"><div class="show-name">Shuffle</div></div>
+        <div class="grid-item shuffle"><div class="show-name">Shuffle</div></div>
+        <a href="https://radioutd.com/shows/genre-study/" class="grid-item electronic">
+            <div class="show-name">Genre Study<br><span class="dj">Noah &amp; Daniel</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/overheard/" class="grid-item electronic">
+            <div class="show-name">Overheard (串台)<br><span class="dj">Yizhuo</span></div>
+        </a>
+
+        <div class="grid-item showtime">6PM – 8PM</div>
+        <a href="https://radioutd.com/shows/its-alive/" class="grid-item alt-rock">
+            <div class="show-name">It's Alive!<br><span class="dj">Mihika</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/heart-factory/" class="grid-item alt-rock">
+            <div class="show-name">Heart Factory<br><span class="dj">Annika</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/reel-life-radio/" class="grid-item pop">
+            <div class="show-name">Reel Life Radio<br><span class="dj">Vaani</span></div>
+        </a>
+        <div class="grid-item shuffle"><div class="show-name">Shuffle</div></div>
+        <div class="grid-item shuffle"><div class="show-name">Shuffle</div></div>
+
+        <div class="grid-item showtime">8PM – 10PM</div>
+        <a href="https://radioutd.com/shows/souvenirs/" class="grid-item talk-show">
+            <div class="show-name">Souvenirs<br><span class="dj">Sukriti &amp; Maryam</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/stuka-peruka/" class="grid-item world">
+            <div class="show-name">Stuka Peruka<br><span class="dj">Sruja</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/a-modest-podcast/" class="grid-item talk-show">
+            <div class="show-name">A Modest Podcast<br><span class="dj">AMP</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/sawa-sawa-radio/" class="grid-item world">
+            <div class="show-name">Sawa Sawa Radio<br><span class="dj">Ivana</span></div>
+        </a>
+        <div class="grid-item shuffle"><div class="show-name">Shuffle</div></div>
+
+        <div class="grid-item showtime">10PM – 12AM</div>
+        <a href="https://radioutd.com/shows/pulse/" class="grid-item hip-hop">
+            <div class="show-name">Pulse<br><span class="dj">Amrita</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/tapped-in/" class="grid-item hip-hop">
+            <div class="show-name">Tapped In<br><span class="dj">Shariq</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/operating-an-angle-grinder/" class="grid-item alt-rock">
+            <div class="show-name">Operating an Angle Grinder<br><span class="dj">Landon</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/russian-roulette/" class="grid-item alt-rock">
+            <div class="show-name">Russian Roulette<br><span class="dj">Lauren</span></div>
+        </a>
+        <a href="https://radioutd.com/shows/auditory-adderall/" class="grid-item electronic">
+            <div class="show-name">Auditory Adderall<br><span class="dj">Laya</span></div>
+        </a>
+
+    </div>
+
+    <p class="footer">Click on a show above to see more details!</p>
+
+</body>
+</html>

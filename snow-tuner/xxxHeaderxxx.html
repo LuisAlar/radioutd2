@@ -1,0 +1,266 @@
+<style>
+    #radioutd-nav *,#radioutd-nav *::before,#radioutd-nav *::after{
+        box-sizing:border-box;margin:0;padding:0
+    }
+
+    #radioutd-nav{
+        background:#ffffff !important;
+        border-bottom:1.5px solid #dddddd !important;
+        padding:0 1.5rem !important;
+        font-family:Arial,sans-serif !important;
+        position:relative !important;
+        z-index:99999 !important;
+    }
+
+    /* Pin the whole SNO <header> to the top with native CSS sticky (no JS = no jumping).
+       z-index stays below the WP admin bar (99999) but above page content. */
+    #wrap > header{
+        position:sticky !important;
+        top:0 !important;
+        z-index:9999 !important;
+        background:#ffffff !important;
+        display:flow-root !important; /* contain SNO's floated header rows */
+    }
+    body.admin-bar #wrap > header{ top:32px !important; }
+    @media (max-width:782px){
+        body.admin-bar #wrap > header{ top:46px !important; }
+    }
+
+    /* Neutralize SNO's scrollToFixed "stick" so it can't fight the sticky header.
+       Values match SNO's own defaults for .sno-designer-area-row (float:left; width:100%). */
+    #wrap > header .sno-header-row-stick{
+        position:relative !important;
+        top:auto !important;
+        left:auto !important;
+        width:100% !important;
+    }
+    #wrap > header .topheaderspacer{ display:none !important; }
+
+    #radioutd-nav .nav-list{
+        display:flex !important;
+        align-items:stretch !important;
+        list-style:none !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    #radioutd-nav .nav-item{
+        position:relative !important;
+        list-style:none !important;
+    }
+
+    #radioutd-nav .nav-btn{
+        display:flex !important;
+        align-items:center !important;
+        gap:6px !important;
+        padding:1rem 1.1rem !important;
+        background:none !important;
+        border:none !important;
+        border-bottom:3px solid transparent !important;
+        cursor:pointer !important;
+        font-family:Arial,sans-serif !important;
+        font-size:13px !important;
+        font-weight:700 !important;
+        letter-spacing:0.08em !important;
+        color:#000000 !important;
+        text-transform:uppercase !important;
+        text-decoration:none !important;
+        white-space:nowrap !important;
+        transition:color 0.15s,border-color 0.15s !important;
+        line-height:1 !important;
+    }
+
+    #radioutd-nav .nav-btn:hover,#radioutd-nav .nav-btn:focus-visible{
+        color:#fe3130  !important;
+        border-bottom-color:#fe3130  !important;
+        outline:none !important;
+    }
+
+    #radioutd-nav .nav-btn:focus-visible{
+        outline:2px solid #fe3130  !important;
+        outline-offset:2px !important;
+        border-radius:3px !important;
+    }
+
+    #radioutd-nav .caret{
+        width:10px !important;
+        height:10px !important;
+        display:inline-block !important;
+        flex-shrink:0 !important;
+        transition:transform 0.2s !important;
+    }
+
+    #radioutd-nav .nav-item:hover .caret{
+        transform:rotate(180deg) !important;
+    }
+
+    #radioutd-nav .dropdown{
+        display:none !important;
+        position:absolute !important;
+        top:100% !important;
+        left:0 !important;
+        min-width:210px !important;
+        background:#ffffff !important;
+        border:1px solid #dddddd !important;
+        border-radius:6px !important;
+        padding:6px 0 !important;
+        z-index:99999 !important;
+        box-shadow:0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    #radioutd-nav .nav-item:hover .dropdown,
+    #radioutd-nav .nav-item.open .dropdown{
+        display:block !important;
+    }
+
+    #radioutd-nav .nav-item.open .caret{
+        transform:rotate(180deg) !important;
+    }
+
+    #radioutd-nav .dropdown li{
+        list-style:none !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    #radioutd-nav .dropdown li::before{
+        display:none !important;
+        content:none !important;
+    }
+
+    #radioutd-nav .dropdown a{
+        display:block !important;
+        padding:9px 18px !important;
+        font-size:12px !important;
+        font-weight:700 !important;
+        letter-spacing:0.07em !important;
+        text-transform:uppercase !important;
+        color:#000000 !important;
+        text-decoration:none !important;
+        background:none !important;
+    }
+
+    #radioutd-nav .dropdown a:hover,#radioutd-nav .dropdown a:focus-visible{
+        background:#f2f2f2 !important;
+        color:#fe3130  !important;
+        outline:none !important;
+    }
+
+    #radioutd-nav .dropdown a:focus-visible{
+        outline:2px solid #fe3130  !important;
+        outline-offset:-2px !important;
+        border-radius:3px !important;
+    }
+
+  </style>
+  
+  <div id="radioutd-nav">
+    <nav aria-label="Main navigation">
+      <h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">Radio UTD main navigation</h2>
+      <ul class="nav-list" role="list">
+  
+        <li class="nav-item">
+          <a class="nav-btn" href="https://www.radioutd.com/tuner">Tune In</a>
+        </li>
+  
+        <li class="nav-item">
+          <a class="nav-btn" href="https://radioutd.com/radio-shows/">Radio Shows</a>
+        </li>
+  
+         <li class="nav-item" id="item-Reviews">
+          <a class="nav-btn" href="https://radioutd.com/category/Reviews/" aria-haspopup="true">
+            Reviews
+            <span class="caret" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <ul class="dropdown" role="list">
+            <li><a href="https://radioutd.com/category/reviews/music-reviews/">Albums</a></li>
+            <li><a href="https://radioutd.com/category/reviews/show-reviews/">Events</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item" id="item-feature">
+          <a class="nav-btn" href="https://radioutd.com/category/feature/" aria-haspopup="true">
+            Features
+            <span class="caret" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <ul class="dropdown" role="list">
+            <li><a href="https://radioutd.com/category/feature/interviews/">Interviews</a></li>
+            <li><a href="https://radioutd.com/category/feature/local-music-session/">Pseudo Stereo</a></li>
+            <li><a href="https://radioutd.com/category/feature/">All</a></li>
+          </ul>
+        </li>
+  
+        <li class="nav-item" id="item-forms">
+          <a class="nav-btn" href="https://radioutd.com/forms/" aria-haspopup="true">
+            Forms
+            <span class="caret" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <ul class="dropdown" role="list">
+            <li><a href="https://radioutd.com/forms/apply-for-dj-or-writer/">Join Radio UTD</a></li>
+            <li><a href="https://radioutd.com/forms/forms-remote-dj-information/">Request a DJ</a></li>
+            <li><a href="https://radioutd.com/forms/local-music/">Submit Music</a></li>
+            <li><a href="https://radioutd.com/forms/forms-psa-public-service-announcement/">Submit a PSA</a></li>
+          </ul>
+        </li>
+  
+        <li class="nav-item" id="item-about">
+          <a class="nav-btn" href="https://radioutd.com/about-2/" aria-haspopup="true">
+            About
+            <span class="caret" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <ul class="dropdown" role="list">
+            <li><a href="https://radioutd.com/about-2/">Management</a></li>
+            <li><a href="https://radioutd.com/blm/">Resources</a></li>
+          </ul>
+        </li>
+  
+      </ul>
+    </nav>
+  </div>
+  
+  <script>
+  (function(){
+    var nav = document.getElementById('radioutd-nav');
+
+    function openItem(item){ item.classList.add('open'); }
+    function closeItem(item){ item.classList.remove('open'); }
+    function closeAll(except){
+      nav.querySelectorAll('.nav-item.open').forEach(function(i){
+        if(i!==except) closeItem(i);
+      });
+    }
+  
+    nav.querySelectorAll('.nav-item').forEach(function(item){
+      var dropdown = item.querySelector('.dropdown');
+      if(!dropdown) return;
+  
+      var trigger = item.querySelector('.nav-btn');
+      var allLinks = Array.from(dropdown.querySelectorAll('a'));
+      var allFocusable = [trigger].concat(allLinks);
+  
+      trigger.addEventListener('focus', function(){
+        closeAll(item);
+        openItem(item);
+      });
+  
+      allFocusable.forEach(function(el){
+        el.addEventListener('blur', function(){
+          setTimeout(function(){
+            if(!item.contains(document.activeElement)) closeItem(item);
+          }, 0);
+        });
+        el.addEventListener('keydown', function(e){
+          if(e.key==='Escape'){ closeItem(item); trigger.focus(); }
+        });
+      });
+    });
+  
+    nav.querySelectorAll('.nav-item:not([id]) .nav-btn').forEach(function(btn){
+      btn.addEventListener('focus', function(){ closeAll(); });
+    });
+  
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('#radioutd-nav')) closeAll();
+    });
+  })();
+  </script>
