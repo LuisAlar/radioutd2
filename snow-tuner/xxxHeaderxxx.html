@@ -36,12 +36,32 @@
     }
     #wrap > header .topheaderspacer{ display:none !important; }
 
+    /* Center the nav block within its container and keep it from stretching too wide */
+    #radioutd-nav nav{
+        width:100% !important;
+        max-width:1200px !important;
+        margin:0 auto !important;
+    }
+
     #radioutd-nav .nav-list{
         display:flex !important;
+        flex-wrap:wrap !important;          /* wrap instead of overflowing on narrow screens */
+        justify-content:center !important;  /* center the items horizontally */
         align-items:stretch !important;
         list-style:none !important;
-        margin:0 !important;
+        margin:0 auto !important;
         padding:0 !important;
+    }
+
+    /* Scale spacing down as the viewport shrinks */
+    @media (max-width:900px){
+        #radioutd-nav{ padding:0 0.75rem !important; }
+        #radioutd-nav .nav-btn{ padding:0.9rem 0.7rem !important; font-size:12px !important; }
+    }
+    @media (max-width:520px){
+        #radioutd-nav{ padding:0 0.25rem !important; }
+        #radioutd-nav .nav-btn{ padding:0.75rem 0.5rem !important; font-size:11px !important; letter-spacing:0.05em !important; }
+        #radioutd-nav .dropdown{ min-width:170px !important; }
     }
 
     #radioutd-nav .nav-item{

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#191414">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Server Usage vs Hobby | Radio UTD</title>
+<style>
+  :root {
+    --bg: #191414;
+    --surface: rgba(52, 49, 49, 0.66);
+    --line: rgba(255, 255, 255, 0.06);
+    --muted: #808184;
+    --text: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.72);
+    --control: #d9d9d9;
+    --accent: #ff3333;
+    --ok: #9be39b;
+    --tight: #f5c26b;
+    --over: #ff5a5a;
+    --radius-lg: 26px;
+    --radius-md: 15px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  a { color: var(--text-dim); }
+
+  #app { max-width: 1100px; margin: 0 auto; padding: 17px 16px 48px; }
+
+  /* Top bar, like the tuner's history pill */
+  #topbar {
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(217, 217, 217, 0.07);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px 0 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #topbar a { text-decoration: none; }
+  #topbar a:hover { color: var(--text); }
+
+  #ranges { display: flex; gap: 2px; }
+  #ranges button {
+    border: none;
+    background: none;
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  #ranges button:hover { color: var(--text); }
+  #ranges button[aria-pressed="true"] { background: var(--control); color: #191414; }
+
+  header { text-align: center; margin: 32px 0 22px; }
+  .wordmark { font-size: 13px; font-weight: 700; letter-spacing: .32em; color: var(--accent); }
+  h1 { margin: 8px 0 0; font-size: clamp(28px, 4.2vw, 40px); font-weight: 700; letter-spacing: -.01em; }
+  header p { margin: 8px 0 0; color: var(--text-dim); font-size: 15px; }
+
+  /* Verdict card, like the tuner's show card */
+  #verdict {
+    position: relative;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    padding: 34px 32px 30px;
+    text-align: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  #verdict::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--state, var(--muted)) 22%, transparent), transparent 70%);
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(25, 20, 20, 0.55);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .pill::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--state, var(--muted));
+  }
+  #verdict .pill { position: absolute; top: 18px; left: 18px; }
+  #verdict .pill::before { animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--state, #fff) 60%, transparent); }
+    70%  { box-shadow: 0 0 0 8px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) { #verdict .pill::before { animation: none; } }
+
+  #verdict-title { margin-top: 18px; font-size: clamp(26px, 3.6vw, 36px); font-weight: 700; color: var(--state, var(--text)); }
+  #verdict-sub { margin-top: 8px; color: var(--text-dim); font-size: 15px; }
+  #stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 24px; }
+  .stat {
+    min-width: 150px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background: rgba(25, 20, 20, 0.45);
+    border: 1px solid var(--line);
+  }
+  .stat strong { display: block; margin-top: 4px; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* Metric cards */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .card {
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    padding: 18px 18px 14px;
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .card h2 { margin: 0; font-size: 15px; font-weight: 600; }
+  .chip {
+    flex: none;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #191414;
+    background: var(--state);
+  }
+  .numbers { margin-top: 12px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+  .numbers .used { font-size: 24px; font-weight: 600; }
+  .numbers .of { color: var(--muted); font-size: 13px; }
+
+  /* Bar: the white tick is the Hobby limit; past it the bar turns red */
+  .bar {
+    position: relative;
+    margin-top: 10px;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(217, 217, 217, .14);
+  }
+  .bar .fill {
+    position: absolute; inset: 0 auto 0 0;
+    border-radius: 4px;
+    background: var(--state);
+    transition: width .6s ease;
+  }
+  .bar .limit {
+    position: absolute; top: -4px; bottom: -4px;
+    width: 2px; margin-left: -1px;
+    background: #fff;
+    border-radius: 1px;
+  }
+  .meta { margin-top: 10px; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .spark { display: block; width: 100%; height: 52px; margin-top: 12px; }
+  .spark .area { fill: color-mix(in srgb, var(--state) 22%, transparent); }
+  .spark .line { fill: none; stroke: var(--state); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .spark .cap { stroke: rgba(255,255,255,.45); stroke-dasharray: 3 3; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .spark-legend { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  #note { margin-top: 22px; font-size: 12px; color: var(--muted); line-height: 1.6; text-align: center; }
+  #status { text-align: center; color: var(--text-dim); margin: 40px 0; }
+  #status.error { color: #ff8a8a; }
+
+  .skeleton {
+    height: 180px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.09), rgba(255,255,255,.04));
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+  [data-state="ok"] { --state: var(--ok); }
+  [data-state="tight"] { --state: var(--tight); }
+  [data-state="over"] { --state: var(--over); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <a href="../index.html">&larr; Radio UTD API</a>
+    <div id="ranges" role="group" aria-label="Time window">
+      <button type="button" data-days="7">7d</button>
+      <button type="button" data-days="30" aria-pressed="true">30d</button>
+      <button type="button" data-days="90">90d</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="wordmark">RADIO UTD</div>
+    <h1>Server usage vs Hobby</h1>
+    <p>Our real Vercel usage, compared with what the free Hobby plan includes.</p>
+  </header>
+
+  <section id="verdict" aria-live="polite">
+    <span class="pill" id="verdict-pill">Loading</span>
+    <div id="verdict-title">Checking usage&hellip;</div>
+    <div id="verdict-sub">&nbsp;</div>
+    <div id="stats"></div>
+  </section>
+
+  <div id="grid">
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+  <p id="status" hidden></p>
+
+  <p id="note">
+    <span id="window-info"></span>
+    “Used” is the total for the window, scaled to 30 days (Hobby limits reset every 30 days).
+    “Pace” is the average of the last 7 days with usage, times 30.
+    A metric is <b>tight</b> above 70% of its limit and <b>over</b> above 100%, by whichever of the two is higher.
+    Source: Vercel billing API, refreshed at most once an hour. Limits from vercel.com/docs/plans/hobby.
+  </p>
+</div>
+
+<script>
+const VERDICT_TEXT = {
+  ok: ['Fits on Hobby', 'Every metric is under 70% of the Hobby limit.'],
+  tight: ['Fits on Hobby, barely', 'Under the limits, but with less than 30% headroom on at least one metric.'],
+  over: ['Would exceed Hobby', 'At least one metric is above what Hobby includes.'],
+};
+const CHIP = { ok: 'Under', tight: 'Tight', over: 'Over' };
+
+function fmt (n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 1 : 2).replace(/\.0+$/, '') + 'M';
+  if (n >= 1000) return Math.round(n).toLocaleString('en-US');
+  if (n === 0) return '0';
+  return n.toFixed(n < 1 ? 3 : 2);
+}
+const pct = n => (n >= 10 ? Math.round(n) : n.toFixed(1)) + '%';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function sparkline (m) {
+  const W = 300, H = 52;
+  const cap = m.limit / 30; // daily share of the 30-day limit
+  const max = Math.max(cap * 1.15, ...m.daily) || 1;
+  const n = m.daily.length;
+  const x = i => (n === 1 ? W / 2 : (i / (n - 1)) * W);
+  const y = v => H - (v / max) * (H - 2) - 1;
+  const pts = m.daily.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"
+      aria-label="Daily ${esc(m.name)}, peak ${fmt(m.peak)} ${esc(m.unit)}">
+    <polygon class="area" points="0,${H} ${pts} ${W},${H}"/>
+    <polyline class="line" points="${pts}"/>
+    <line class="cap" x1="0" x2="${W}" y1="${y(cap)}" y2="${y(cap)}"/>
+  </svg>`;
+}
+
+function card (m, data) {
+  const shown = Math.max(m.pct, m.pacePct);
+  const scale = Math.max(100, shown * 1.05); // bar width in % of limit
+  return `<article class="card" data-state="${m.verdict}">
+    <div class="card-head"><h2>${esc(m.name)}</h2><span class="chip">${CHIP[m.verdict]}</span></div>
+    <div class="numbers">
+      <span class="used">${fmt(m.total * 30 / data.windowDays)}</span>
+      <span class="of">of ${fmt(m.limit)} ${esc(m.unit)} / 30 days</span>
+    </div>
+    <div class="bar" title="${pct(shown)} of the Hobby limit">
+      <div class="fill" style="width:${(shown / scale) * 100}%"></div>
+      <div class="limit" style="left:${(100 / scale) * 100}%"></div>
+    </div>
+    <div class="meta">
+      <span>Used <b>${pct(m.pct)}</b></span>
+      <span>Pace <b>${pct(m.pacePct)}</b></span>
+      <span>Peak day ${fmt(m.peak)}</span>
+    </div>
+    ${sparkline(m)}
+    <div class="spark-legend"><span>${data.from}</span><span>- - Hobby daily share</span><span>${data.to}</span></div>
+  </article>`;
+}
+
+async function load (days) {
+  document.querySelectorAll('#ranges button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.days === String(days))));
+  const status = document.getElementById('status');
+  status.hidden = true;
+  try {
+    const res = await fetch(`/api/get-vercel-usage?days=${days}`);
+    const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+    render(data);
+  } catch (err) {
+    document.getElementById('grid').innerHTML = '';
+    document.getElementById('verdict').dataset.state = '';
+    document.getElementById('verdict-pill').textContent = 'Error';
+    document.getElementById('verdict-title').textContent = 'Could not load usage';
+    document.getElementById('verdict-sub').textContent = err.message;
+  }
+}
+
+function render (data) {
+  const v = document.getElementById('verdict');
+  v.dataset.state = data.verdict;
+  const [title, sub] = VERDICT_TEXT[data.verdict];
+  document.getElementById('verdict-pill').textContent = CHIP[data.verdict] + ' Hobby limits';
+  document.getElementById('verdict-title').textContent = title;
+  document.getElementById('verdict-sub').textContent = sub;
+
+  const worst = data.metrics.reduce((a, b) => (Math.max(b.pct, b.pacePct) > Math.max(a.pct, a.pacePct) ? b : a));
+  const overCount = data.metrics.filter(m => m.verdict === 'over').length;
+  document.getElementById('stats').innerHTML = [
+    ['Closest to limit', `${esc(worst.name)}`],
+    ['Highest share', pct(data.worstPct)],
+    ['Metrics over', `${overCount} / ${data.metrics.length}`],
+    ['Window', `${data.windowDays} days`],
+  ].map(([k, val]) => `<div class="stat"><span class="label">${k}</span><strong>${val}</strong></div>`).join('');
+
+  // Worst first, so what would block Hobby is at the top
+  const sorted = [...data.metrics].sort((a, b) => Math.max(b.pct, b.pacePct) - Math.max(a.pct, a.pacePct));
+  document.getElementById('grid').innerHTML = sorted.map(m => card(m, data)).join('');
+
+  const status = document.getElementById('status');
+  if (data.unknownUnits.length) {
+    status.hidden = false;
+    status.className = 'error';
+    status.textContent = 'Unrecognised units, numbers may be unconverted: ' + data.unknownUnits.join('; ');
+  }
+  document.getElementById('window-info').textContent =
+    `${data.from} to ${data.to}${data.project ? ', project ' + data.project : ', whole team'}. Updated ${new Date(data.generatedAt).toLocaleString()}. `;
+}
+
+document.getElementById('ranges').addEventListener('click', e => {
+  const b = e.target.closest('button[data-days]');
+  if (b) load(Number(b.dataset.days));
+});
+load(30);
+</script>
+</body>
+</html>

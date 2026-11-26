@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Tune in to Radio UTD's stream, and view details about the currently playing track.">
+<meta name="theme-color" content="#191414">
+<meta property="og:image" content="/tuner/assets/og-image.jpg">
+<link rel="icon" type="image/png" href="/tuner/icon.c5a8514a.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Tuner - Radio UTD</title>
+<style>
+  :root {
+    --bg: #191414;
+    --surface: rgba(52, 49, 49, 0.66);
+    --surface-solid: #2a2626;
+    --bar: rgba(217, 217, 217, 0.31);
+    --muted: #808184;
+    --text: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.72);
+    --control: #d9d9d9;
+    --accent: #ff3333;
+    /* Overridden per show from the API's colorLight / colorDark */
+    --show-light: var(--accent);
+    --show-dark: #111;
+    --radius-lg: 26px;
+    --radius-md: 15px;
+    --radius-sm: 11px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  button { font: inherit; color: inherit; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- Layout ---------- */
+  #app {
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 17px 16px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ---------- Song history ticker (top bar) ---------- */
+  #history-bar {
+    width: min(720px, 100%);
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(217, 217, 217, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #history-label {
+    flex: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px 0 14px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 1;
+  }
+  #history-label svg { width: 14px; height: 14px; flex: none; }
+
+  #history-viewport {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    /* soft fade at both edges so songs glide in and out */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  }
+
+  #history-track {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: max-content;
+    will-change: transform;
+  }
+  #history-track.gliding { animation: glide var(--glide-duration, 40s) linear infinite; }
+  #history-viewport:hover #history-track.gliding,
+  #history-viewport:focus-within #history-track.gliding { animation-play-state: paused; }
+
+  @keyframes glide {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  .history-group { display: flex; align-items: center; }
+
+  .history-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0 18px;
+    white-space: nowrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    position: relative;
+  }
+  .history-item + .history-item::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 50%;
+    background: var(--show-light);
+    opacity: .6;
+  }
+  .history-item .h-title { font-weight: 500; }
+  .history-item .h-artist { color: var(--muted); }
+  .history-empty { padding: 0 18px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #history-track.gliding { animation: none; }
+    #history-viewport { overflow-x: auto; }
+  }
+
+  /* ---------- Chat (comment) button + popover ---------- */
+  /* Logo row: logo centred, chat button on the left at the same height */
+  #brand-row {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    z-index: 20;
+  }
+
+  #chat-wrap {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  #chat-toggle {
+    width: 71px;
+    height: 71px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: color .2s, transform .2s;
+  }
+  #chat-toggle:hover, #chat-toggle[aria-expanded="true"] { color: var(--text); }
+  #chat-toggle:active { transform: scale(.94); }
+  #chat-toggle svg { width: 100%; height: 100%; display: block; }
+
+  #comment-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    width: 300px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(128, 129, 132, 0.30);
+    -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    transform-origin: top left;
+    transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+    opacity: 0;
+    transform: translateY(-6px) scale(.97);
+    visibility: hidden;
+  }
+  #comment-panel.open {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+
+  #comment-panel label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  #comment-input {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(25, 20, 20, 0.6);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  #comment-input::placeholder { color: rgba(255, 255, 255, 0.45); }
+
+  .comment-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  #comment-count { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+  #comment-submit {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+    background: var(--control);
+    color: #191414;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .15s, opacity .15s;
+  }
+  #comment-submit:hover { background: #fff; }
+  #comment-submit:disabled { opacity: .5; cursor: default; }
+
+  #comment-status { min-height: 1.2em; margin: 8px 0 0; font-size: 12px; color: var(--text-dim); }
+  #comment-status.error { color: #ff8a8a; }
+  #comment-status.ok { color: #9be39b; }
+
+  /* ---------- Logo ---------- */
+  #logo-link { display: block; line-height: 0; }
+  #logo { display: block; width: min(431px, 62vw); height: auto; }
+
+  /* ---------- Show card (centre box) ---------- */
+  #show-card {
+    position: relative;
+    width: min(547px, 100%);
+    aspect-ratio: 547 / 493;
+    margin-top: 10px;
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px;
+    isolation: isolate;
+  }
+  /* Show image: fills the box, fades in, with a gradient so the title stays readable */
+  #show-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.03);
+    transition: opacity .6s ease, transform 1.2s ease;
+  }
+  #show-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(25,20,20,.10) 0%, rgba(25,20,20,.35) 40%, rgba(25,20,20,.80) 75%, rgba(25,20,20,.95) 100%);
+  }
+  #show-card.has-bg #show-bg { opacity: 1; transform: none; }
+  /* With an image, the title sits over the dark bottom of the gradient */
+  #show-card.has-bg { justify-content: flex-end; padding-bottom: 36px; }
+  #show-card.has-bg #show-name { text-shadow: 0 2px 16px rgba(0,0,0,.6); }
+  #show-card.has-bg #show-host,
+  #show-card.has-bg #show-desc { color: rgba(255,255,255,.85); text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+  #show-card.has-bg #show-desc { -webkit-line-clamp: 2; }
+
+  #on-air {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(25, 20, 20, 0.55);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  #on-air::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(255, 51, 51, .6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 51, 51, .6); }
+    70%  { box-shadow: 0 0 0 8px rgba(255, 51, 51, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) { #on-air::before { animation: none; } }
+
+  #show-info-icon {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 18px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .4);
+  }
+  #show-info-icon.empty { display: none; }
+
+  #show-name {
+    font-size: clamp(28px, 4.2vw, 40px);
+    font-weight: 500;
+    line-height: 1.15;
+    margin: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  #show-host { margin-top: 8px; font-size: 16px; color: var(--text-dim); }
+  #show-desc {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    max-width: 40ch;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ---------- Now playing (left aligned under the card) ---------- */
+  #now-playing {
+    width: min(547px, 100%);
+    margin-top: 22px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  #np-left  { flex: 1 1 auto; min-width: 0; }
+  /* Album sits level with the song title (same line height as the title row) */
+  #np-right { flex: 0 1 40%; min-width: 0; align-self: flex-start; }
+  #np-right .np-album { min-height: 34px; }
+  .np-line { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .np-line .scroll-wrapper { flex: 0 1 auto; min-width: 0; }
+  .np-icon { flex: none; color: var(--muted); }
+  .np-title .np-icon  { width: 24px; height: 24px; }
+  .np-artist { margin-top: 2px; }
+  .np-artist .np-icon { width: 24px; height: 20px; } /* same column width as the note icon so text lines up */
+  .np-album { justify-content: flex-end; gap: 8px; }
+  .np-album .np-icon  { width: 22px; height: 22px; }
+  #np-right.empty { visibility: hidden; }
+  .scroll-wrapper { overflow: hidden; white-space: nowrap; }
+  .scroll-wrapper > div { display: inline-block; }
+  #song-title  { font-size: 28px; font-weight: 500; line-height: 1.2; }
+  #song-artist { font-size: 19px; color: var(--text); }
+  #song-album  { font-size: 19px; color: var(--text-dim); }
+
+  /* ---------- Play button ---------- */
+  #play-button {
+    margin-top: 22px;
+    width: 72px;
+    height: 72px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--control);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .2s, color .2s, transform .15s;
+  }
+  #play-button:hover { background: rgba(217, 217, 217, 0.12); color: #fff; }
+  #play-button:active { transform: scale(.94); }
+  #play-button svg { width: 56px; height: 56px; }
+  #play-button-pause-icon { display: none; }
+
+  /* ---------- Volume slider ---------- */
+  #volume-wrap {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(260px, 100%);
+  }
+
+  #volume-slider {
+    --fill: 100%;
+    flex: 1;
+    min-width: 0;
+    height: 24px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+            appearance: none;
+  }
+  #volume-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--control) var(--fill), rgba(217,217,217,.2) var(--fill));
+  }
+  #volume-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(217,217,217,.2);
+  }
+  #volume-slider::-moz-range-progress {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--control);
+  }
+  #volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -5px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,.5);
+    transition: transform .15s;
+  }
+  #volume-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,.5);
+  }
+  #volume-slider:hover::-webkit-slider-thumb,
+  #volume-slider:active::-webkit-slider-thumb { transform: scale(1.2); }
+  #volume-slider.muted::-webkit-slider-runnable-track { background: rgba(217,217,217,.2); }
+  #volume-slider.muted::-moz-range-progress { background: transparent; }
+
+  #mute-button {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  #mute-button:hover { color: var(--text); }
+  #mute-button svg { width: 100%; height: 100%; display: block; }
+  #volume-readout { flex: none; font-size: 13px; color: var(--text-dim); min-width: 5ch; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Loading placeholder ---------- */
+  .loading-placeholder {
+    display: inline-block;
+    width: 12em;
+    max-width: 100%;
+    height: .9em;
+    border-radius: 4px;
+    background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.18), rgba(255,255,255,.08));
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    vertical-align: middle;
+  }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+  /* ---------- Footer ---------- */
+  #bottom {
+    margin-top: 72px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--show-dark);
+    transition: background-color .4s;
+  }
+  #bottom-inner {
+    max-width: 936px;
+    margin: 0 auto;
+    padding: 32px 16px 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-dim);
+  }
+  .footer-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  #social-icons { display: flex; gap: 14px; }
+  #social-icons a { display: block; width: 24px; height: 24px; opacity: .75; transition: opacity .15s; }
+  #social-icons a:hover { opacity: 1; }
+  #social-icons svg { width: 100%; height: 100%; }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 760px) {
+    #app { padding-top: 12px; }
+    #history-bar { height: 30px; }
+    #history-label span { display: none; }
+    #history-label { padding: 0 10px 0 12px; }
+    #brand-row { margin-top: 18px; }
+    #chat-wrap { left: 0; }
+    #chat-toggle { width: 48px; height: 48px; }
+    #comment-panel { width: min(300px, calc(100vw - 32px)); }
+    #logo-link { padding: 0 60px; }
+    #np-right { flex-basis: 38%; }
+    #song-album { font-size: 16px; }
+    #np-right .np-album { min-height: 29px; }
+    .np-album .np-icon { width: 19px; height: 19px; }
+    #logo { width: min(431px, 100%); }
+    #show-card { aspect-ratio: auto; min-height: 300px; padding: 48px 20px 28px; }
+    #song-title { font-size: 24px; }
+    #song-artist { font-size: 17px; }
+    #bottom-inner { grid-template-columns: 1fr; gap: 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Song history: gliding ticker -->
+  <section id="history-bar" aria-label="Recently played songs">
+    <div id="history-label">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      <span>Recently played</span>
+    </div>
+    <div id="history-viewport" tabindex="0">
+      <div id="history-track">
+        <div class="history-empty"><span class="loading-placeholder" style="width:14em"></span></div>
+      </div>
+    </div>
+    <ul id="history-list" class="visually-hidden"></ul>
+  </section>
+
+  <!-- Logo row: chat button sits on the left, level with the logo -->
+  <div id="brand-row">
+  <!-- Chat button (replaces old sidebar) + comment box -->
+  <div id="chat-wrap">
+    <button id="chat-toggle" aria-label="Send the DJ a message" aria-expanded="false" aria-controls="comment-panel">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="31 72 71 71" aria-hidden="true"><path d="M43.2253 115.281L39.5333 123.155C39.3625 123.517 39.4374 123.953 39.7214 124.237C39.9056 124.423 40.1512 124.519 40.4007 124.519C40.5369 124.519 40.6751 124.49 40.8037 124.431L53.8024 118.407C55.2934 118.59 56.6597 118.678 57.9665 118.678C72.8937 118.678 85.0367 109.283 85.0367 97.7366C85.0386 86.1924 72.8957 76.7974 57.9684 76.7974C43.0411 76.7974 30.8982 86.1924 30.8982 97.7366C30.8982 104.9 35.4863 111.399 43.2253 115.281ZM57.9684 78.7163C71.8364 78.7163 83.1197 87.2478 83.1197 97.7366C83.1197 108.225 71.8364 116.759 57.9684 116.759C56.6616 116.759 55.2896 116.665 53.7717 116.471C53.5952 116.45 53.411 116.479 53.2478 116.552L42.3906 121.581L45.3668 115.235C45.4762 115.005 45.4858 114.74 45.3995 114.5C45.3131 114.26 45.1327 114.063 44.9005 113.957C37.3342 110.459 32.8171 104.395 32.8171 97.7366C32.8171 87.2478 44.1004 78.7163 57.9684 78.7163Z" fill="currentColor"/>
+<path d="M44.8104 102.373C45.1212 102.448 45.4379 102.486 45.7526 102.486C46.9365 102.486 48.0361 101.953 48.7691 101.022C49.5021 100.091 49.7612 98.8823 49.4772 97.706C49.149 96.3435 48.0572 95.2517 46.6928 94.9216C45.2057 94.5609 43.6609 95.0962 42.736 96.2745C42.003 97.2051 41.7439 98.4141 42.0279 99.5884C42.3542 100.951 43.446 102.043 44.8104 102.373ZM44.2424 97.4642C44.6089 96.9979 45.1596 96.7293 45.7526 96.7293C45.9138 96.7293 46.0788 96.7504 46.2419 96.7887C46.902 96.948 47.4508 97.4968 47.6101 98.1569C47.7559 98.7652 47.6312 99.362 47.2589 99.8341C46.7907 100.429 46.0212 100.688 45.2594 100.508C44.5993 100.348 44.0505 99.7995 43.8912 99.1394C43.7454 98.5311 43.8701 97.9363 44.2424 97.4642Z" fill="currentColor"/>
+<path d="M56.1339 102.373C56.4447 102.448 56.7613 102.486 57.076 102.486C58.26 102.486 59.3576 101.953 60.0907 101.022C60.8237 100.091 61.0827 98.8823 60.7987 97.706C60.4706 96.3435 59.3787 95.2517 58.0144 94.9216C56.5292 94.5609 54.9844 95.0962 54.0576 96.2745C53.3246 97.2051 53.0655 98.4121 53.3476 99.5884C53.6757 100.949 54.7695 102.043 56.1339 102.373ZM55.5659 97.4642C55.9324 96.9979 56.4831 96.7293 57.076 96.7293C57.2372 96.7293 57.4023 96.7504 57.5654 96.7887C58.2255 96.948 58.7762 97.4968 58.9336 98.1569C59.0813 98.7652 58.9566 99.362 58.5824 99.8341C58.1161 100.431 57.3466 100.69 56.5829 100.508C55.9228 100.348 55.372 99.7995 55.2128 99.1394C55.0669 98.5311 55.1917 97.9363 55.5659 97.4642Z" fill="currentColor"/>
+<path d="M67.4556 102.373C67.7665 102.448 68.0831 102.486 68.3978 102.486C69.5818 102.486 70.6813 101.953 71.4144 101.022C72.1474 100.091 72.4064 98.8823 72.1224 97.706C71.7943 96.3435 70.7024 95.2517 69.3381 94.9216C67.8529 94.5609 66.3062 95.0962 65.3813 96.2745C64.6483 97.2051 64.3892 98.4121 64.6732 99.5884C65.0013 100.951 66.0932 102.043 67.4556 102.373ZM66.8876 97.4642C67.2542 96.9979 67.8049 96.7293 68.3978 96.7293C68.559 96.7293 68.724 96.7504 68.8872 96.7887C69.5473 96.948 70.0961 97.4968 70.2553 98.1569C70.4012 98.7652 70.2764 99.362 69.9042 99.8341C69.436 100.429 68.6646 100.688 67.9047 100.508C67.2446 100.348 66.6938 99.7995 66.5346 99.1394C66.3906 98.5311 66.5154 97.9363 66.8876 97.4642Z" fill="currentColor"/>
+<path d="M88.3909 100.243C87.8766 100.099 87.3489 100.383 87.1973 100.89C87.0457 101.398 87.3335 101.932 87.8421 102.083C95.2241 104.282 100.183 109.776 100.183 115.748C100.183 120.896 96.5041 125.738 90.5823 128.384C90.1716 128.568 89.9433 129.011 90.0335 129.453L91.1656 134.943L85.0827 130.347C84.8773 130.193 84.6221 130.136 84.3669 130.163C83.1158 130.343 81.88 130.435 80.6903 130.435C73.6651 130.435 66.8683 126.847 64.1626 121.708C63.917 121.238 63.3336 121.059 62.8673 121.305C62.3991 121.553 62.2187 122.132 62.4663 122.6C65.4886 128.344 72.9839 132.354 80.6922 132.354C81.8454 132.354 83.039 132.275 84.2441 132.118L92.0445 138.009C92.2134 138.138 92.4168 138.203 92.6221 138.203C92.8005 138.203 92.979 138.155 93.1344 138.055C93.4722 137.842 93.643 137.441 93.5624 137.052L92.0675 129.81C98.2771 126.783 102.102 121.455 102.102 115.75C102.102 108.813 96.7209 102.728 88.3909 100.243Z" fill="currentColor"/></svg>
+    </button>
+    <div id="comment-panel" role="dialog" aria-label="Message the DJ">
+      <label for="comment-input">Send the DJ a message!</label>
+      <textarea id="comment-input" placeholder="Song request, shout-out, feedback…" maxlength="512"></textarea>
+      <div class="comment-actions">
+        <span id="comment-count">0 / 512</span>
+        <button id="comment-submit">Send</button>
+      </div>
+      <p id="comment-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <a id="logo-link" href="https://radioutd.com/" aria-label="Radio UTD home">
+    <img id="logo" src="radioutd-logo.png" alt="Radio UTD" width="431" height="119">
+  </a>
+  </div>
+
+  <!-- Centre box: current show -->
+  <section id="show-card" aria-label="Current show">
+    <div id="show-bg" aria-hidden="true"></div>
+    <div id="on-air">On-Air</div>
+    <img id="show-info-icon" class="empty" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
+    <h1 id="show-name"><span class="loading-placeholder" style="width:7em"></span></h1>
+    <div id="show-host"><span class="loading-placeholder" style="width:5em"></span></div>
+    <div id="show-desc"></div>
+  </section>
+
+  <!-- Now playing: title + artist on the left, album on the right -->
+  <section id="now-playing" aria-label="Now playing" aria-live="polite">
+    <div id="np-left">
+      <div class="np-line np-title" title="Song"><svg class="np-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg><div class="scroll-wrapper"><div id="song-title"><span class="loading-placeholder" style="width:9em"></span></div></div></div>
+      <div class="np-line np-artist" title="Artist"><svg class="np-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><div class="scroll-wrapper"><div id="song-artist"><span class="loading-placeholder" style="width:6em"></span></div></div></div>
+    </div>
+    <div id="np-right">
+      <div class="np-line np-album" title="Album"><svg class="np-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg><div class="scroll-wrapper"><div id="song-album"></div></div></div>
+    </div>
+  </section>
+
+  <button id="play-button" aria-label="Play">
+    <svg id="play-button-play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15L19.5 12z"/></svg>
+    <svg id="play-button-pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </button>
+
+  <!-- Volume slider (horizontal, like the old tuner) -->
+  <div id="volume-wrap">
+      <button id="mute-button" aria-label="Mute">
+        <svg id="volume-on-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        <svg id="volume-off-icon" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+      </button>
+      <input type="range" min="0" max="100" step="1" value="100" id="volume-slider" aria-label="Volume">
+      <span id="volume-readout">100%</span>
+  </div>
+</div>
+
+<footer id="bottom">
+  <div id="bottom-inner">
+    <div id="about-wrap">
+      <div class="footer-label">About Us</div>
+      <div>As the only student-run radio station for the University of Texas at Dallas, Radio UTD fulfills many duties on campus. Founded in 2002, the Radio UTD family has grown steadily thanks to the help from the university, student body, and ever supportive Dallas music scene.</div>
+    </div>
+    <div id="follow-us-wrap">
+      <div class="footer-label">Follow Us</div>
+      <div id="social-icons">
+        <a href="https://www.facebook.com/RadioUTD/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="https://instagram.com/radioutd/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg></a>
+        <a href="https://twitter.com/RadioUTD/" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></a>
+        <a href="https://www.youtube.com/channel/UCvK-JFQT3xuqJpERQoEItMw" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<audio id="audio" src="https://streamer.radio.co/sf849b08e1/listen" autoplay></audio>
+<script src="tuner-new.js"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"55eedc34c1734a75a3e3e3cc072433d1","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

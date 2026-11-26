@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vercel usage vs Hobby limits</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 24px; color: #1d1d1f; background: #fafafa; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.note { color: #555; font-size: 13px; margin: 4px 0 16px; }
+  textarea { width: 100%; height: 140px; font-family: ui-monospace, monospace; font-size: 12px; box-sizing: border-box; }
+  button { margin-top: 8px; padding: 6px 14px; font-size: 14px; cursor: pointer; }
+  .metric { background: #fff; border: 1px solid #e3e3e3; border-radius: 8px; padding: 14px 16px; margin: 16px 0; }
+  .metric h2 { font-size: 15px; margin: 0 0 2px; }
+  .sub { font-size: 12px; color: #555; margin-bottom: 8px; }
+  svg { width: 100%; height: 200px; display: block; }
+  .over { color: #b00020; font-weight: 600; }
+  .tight { color: #b26a00; font-weight: 600; }
+  .ok { color: #1b7f3a; font-weight: 600; }
+  .err { color: #b00020; }
+</style>
+</head>
+<body>
+<h1>Vercel usage vs Hobby limits</h1>
+<p class="note">Paste the output of <code>node scripts/vercel-usage-vs-hobby.mjs --daily</code> below (the tab-separated block, starting with the <code>date</code> line), then click Draw.</p>
+<textarea id="input" placeholder="date	Fast Origin Transfer	Fast Data Transfer	..."></textarea>
+<div><button id="draw">Draw</button> <span id="status" class="err"></span></div>
+<div id="out"></div>
+
+<script>
+// Hobby included usage, copied from scripts/vercel-usage-vs-hobby.mjs (HOBBY_LIMITS).
+const LIMITS = {
+  'Fast Origin Transfer': { limit: 10, unit: 'GB' },
+  'Fast Data Transfer': { limit: 100, unit: 'GB' },
+  'CDN / Edge Requests': { limit: 1000000, unit: 'requests' },
+  'Function Invocations': { limit: 1000000, unit: 'invocations' },
+  'Active CPU': { limit: 4, unit: 'hours' },
+  'Provisioned Memory': { limit: 360, unit: 'GB-hrs' },
+  'Image Transformations': { limit: 5000, unit: 'units' },
+};
+
+function parseNum(s) {
+  return Number(String(s).replace(/,/g, '')) || 0;
+}
+
+function parse(text) {
+  const lines = text.split('\n').map(l => l.replace(/\r$/, '')).filter(l => l.trim());
+  const start = lines.findIndex(l => l.startsWith('date\t'));
+  if (start < 0) throw new Error('No "date<TAB>..." header line found. Paste the --daily output.');
+  const names = lines[start].split('\t').slice(1);
+  const rows = lines.slice(start + 1)
+    .map(l => l.split('\t'))
+    .filter(c => /^\d{4}-\d{2}-\d{2}$/.test(c[0]));
+  if (!rows.length) throw new Error('No daily rows found under the header.');
+  return { names, rows: rows.map(c => ({ date: c[0], values: c.slice(1).map(parseNum) })) };
+}
+
+function fmt(n) {
+  if (n >= 1000) return Math.round(n).toLocaleString('en-US');
+  return n.toFixed(n < 1 ? 3 : 2);
+}
+
+function drawMetric(name, dates, values, limit) {
+  const W = 800, H = 200, pad = 28;
+  const max = Math.max(limit || 0, ...values, 1e-9);
+  const bw = (W - pad * 2) / dates.length;
+  const y = v => H - pad - (v / max) * (H - pad * 2);
+  let bars = '';
+  values.forEach((v, i) => {
+    const x = pad + i * bw + bw * 0.15;
+    const h = (v / max) * (H - pad * 2);
+    bars += `<rect x="${x.toFixed(1)}" y="${(H - pad - h).toFixed(1)}" width="${(bw * 0.7).toFixed(1)}" height="${h.toFixed(1)}" fill="#4a7bd0"><title>${dates[i]}: ${fmt(v)}</title></rect>`;
+  });
+  const limitLine = limit ? `<line x1="${pad}" x2="${W - pad}" y1="${y(limit)}" y2="${y(limit)}" stroke="#b00020" stroke-dasharray="6 4"/><text x="${W - pad}" y="${y(limit) - 4}" text-anchor="end" font-size="11" fill="#b00020">Hobby limit ${fmt(limit)}</text>` : '';
+  const axis = `<line x1="${pad}" x2="${W - pad}" y1="${H - pad}" y2="${H - pad}" stroke="#999"/>`;
+  const labels = `<text x="${pad}" y="${H - 8}" font-size="10" fill="#555">${dates[0]}</text><text x="${W - pad}" y="${H - 8}" text-anchor="end" font-size="10" fill="#555">${dates[dates.length - 1]}</text><text x="4" y="${pad}" font-size="10" fill="#555">${fmt(max)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${axis}${bars}${limitLine}${labels}</svg>`;
+}
+
+function render() {
+  const out = document.getElementById('out');
+  const status = document.getElementById('status');
+  status.textContent = '';
+  try {
+    const { names, rows } = parse(document.getElementById('input').value);
+    const dates = rows.map(r => r.date);
+    const total = (i) => rows.reduce((a, r) => a + (r.values[i] || 0), 0);
+    let html = '';
+    names.forEach((name, i) => {
+      const meta = LIMITS[name];
+      const values = rows.map(r => r.values[i] || 0);
+      const sum = total(i);
+      const limit = meta ? meta.limit : 0;
+      const unit = meta ? meta.unit : '';
+      const pct = meta ? (sum / limit) * 100 : null;
+      const cls = pct === null ? '' : pct > 100 ? 'over' : pct > 70 ? 'tight' : 'ok';
+      const pctText = pct === null ? '' : ` &middot; <span class="${cls}">${pct.toFixed(1)}% of Hobby limit in this window</span>`;
+      html += `<div class="metric"><h2>${name}</h2><div class="sub">Total ${fmt(sum)} ${unit}${meta ? ` of ${fmt(limit)} ${unit}` : ''}${pctText}</div>${drawMetric(name, dates, values, limit)}</div>`;
+    });
+    out.innerHTML = html;
+  } catch (e) {
+    out.innerHTML = '';
+    status.textContent = e.message;
+  }
+}
+
+document.getElementById('draw').addEventListener('click', render);
+</script>
+</body>
+</html>

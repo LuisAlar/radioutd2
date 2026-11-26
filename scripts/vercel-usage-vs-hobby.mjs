@@ -34,7 +34,7 @@ function parseArgs (argv) {
   const args = { days: 30 }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
-    if (a === '--dump') args.dump = true
+    if (a === '--dump' || a === '--daily') args[a.slice(2)] = true
     else if (a.startsWith('--')) args[a.slice(2)] = argv[++i]
   }
   return args
@@ -110,7 +110,7 @@ async function main () {
 
   const rows = (await fetchCharges({
     token,
-    teamId: process.env.VERCEL_TEAM_ID,
+    teamId: process.env.VERCEL_TEAM_ID || process.env.VERCEL_ORG_ID,
     slug: process.env.VERCEL_TEAM_SLUG,
     from,
     to,
